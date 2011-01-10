@@ -1,0 +1,11 @@
+<things version="1">
+	<entity name="MainScreen">
+		<component type="DisplayScreenAndSwitchLevelComponent" name="DisplayScreenAndSwitchLevel">
+			<levelToSwitchTo>2</levelToSwitchTo>
+		</component>
+	</entity>
+
+  	<group name="Level1Data">
+		<objectReference name="MainScreen"/>
+  	</group>
+</things>

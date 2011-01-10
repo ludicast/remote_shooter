@@ -1,0 +1,266 @@
+<things version="1">
+	<entity name="ExplosionSpriteSheet">
+	    <component type="com.pblabs.rendering2D.spritesheet.SpriteSheetComponent" name="SpriteSheet">
+	      <divider type="com.pblabs.rendering2D.spritesheet.CellCountDivider">
+	        <xCount>8</xCount>
+	        <yCount>1</yCount>
+	      </divider>
+	      <image filename="assets/bigexplosion.png"/>
+	    </component>
+	  </entity>
+	  
+	  <entity name="EnemyManager">
+		<component type="EnemyManagerComponent" name="EnemyManager"/>
+	  </entity>
+	  
+	  <entity name="LevelSwitchManager">
+		<component type="TimedSwitchLevelComponent" name="TimedSwitchLevel">
+			<countDown>5</countDown>
+			<level>1</level>
+		</component>
+	  </entity>
+
+	  <entity name="Background">
+	  	<component type="com.pblabs.rendering2D.SimpleSpatialComponent" name="Spatial">
+			<position type="">
+				<x>0</x>
+				<y></y>
+			</position>
+			<size type="">
+				<x>1024</x>
+				<y>1024</y>
+			</size>
+			<spatialManager componentReference="SceneDB"/>
+    	</component>
+		<component type="com.pblabs.rendering2D.SpriteRenderer" name="Render">
+    		<scene componentReference="SceneDB"/>
+    		<positionProperty>@Spatial.position</positionProperty>
+    		<fileName>assets/background.png</fileName>
+			<zIndex>-1</zIndex>
+    	</component>
+		<component type="VerticallyScrollingComponent" name="VerticallyScrolling">
+			<positionProperty>@Spatial.position</positionProperty>
+			<sizeProperty>@Spatial.size</sizeProperty>
+			<scrollSpeed>20</scrollSpeed>
+		</component>
+	  </entity>
+	  
+	  <template name="Explosion">
+	  	<component type="com.pblabs.rendering2D.SimpleSpatialComponent" name="Spatial">
+			<position type="">
+				<x>0</x>
+				<y>0</y>
+			</position>
+			<size type="">
+				<x>65</x>
+				<y>54</y>
+			</size>
+			<spatialManager componentReference="SceneDB"/>
+    	</component>
+		<component type="com.pblabs.animation.AnimatorComponent" name="FrameAnimation">
+		  <animations childType="com.pblabs.animation.Animator">
+			<idle type="">
+			  <animationType>PLAY_ANIMATION_ONCE</animationType>
+			  <duration>1</duration>
+			  <repeatCount>-1</repeatCount>
+			  <startValue type="int">0</startValue>
+			  <targetValue type="int">7</targetValue>
+			</idle>
+		  </animations>
+		  <defaultAnimation>idle</defaultAnimation>
+		  <reference>@Render.spriteIndex</reference>
+		</component>		
+	    <component type="com.pblabs.rendering2D.SpriteSheetRenderer" name="Render">
+			<scene componentReference="SceneDB"/>
+			<positionProperty>@Spatial.position</positionProperty>
+			<rotationProperty>@Spatial.rotation</rotationProperty>
+			<sizeProperty>@Spatial.size</sizeProperty>
+			<spriteSheet componentReference="ExplosionSpriteSheet"/>
+		</component>
+		<component type="RemoveAfterTimeComponent" name="RemoveAfterTime">
+			<countDown>2</countDown>
+		</component>
+		<component type="com.pblabs.components.basic.EventSoundTrigger" name="EventSoundTrigger">
+			<startSound filename="assets/explosion.mp3"/>
+		</component>
+	  </template>
+
+	<entity name="Player">    	
+		<component type="com.pblabs.box2D.Box2DSpatialComponent" name="Spatial">
+    		<spatialManager componentReference="SceneDB"/>
+      		<canRotate>false</canRotate>
+      		<canSleep>false</canSleep>
+      		<collidesWithTypes childType="String">
+        		<_0>Enemy</_0>
+      		</collidesWithTypes>
+      		<size type="">
+				<x>45</x>
+				<y>78</y>
+			</size>
+      		<position type="">
+				<x>100</x>
+				<y>100</y>
+			</position>
+      		<collisionShapes childType="com.pblabs.box2D.CollisionShape">
+        		<_0 type="com.pblabs.box2D.PolygonCollisionShape">
+		          <vertices childType="flash.geom.Point">
+		            <_0 type="">
+		              <x>-1</x>
+		              <y>-1</y>
+		            </_0>
+		            <_1 type="">
+		              <x>1</x>
+		              <y>-1</y>
+		            </_1>
+		            <_2 type="">
+		              <x>1</x>
+		              <y>1</y>
+		            </_2>
+		            <_3 type="">
+		              <x>-1</x>
+		              <y>1</y>
+		            </_3>
+		          </vertices>
+		        </_0>
+      		</collisionShapes>
+      		<collisionType childType="String">
+        		<_0>Player</_0>
+        		<_1>Renderable</_1>
+      		</collisionType>      		
+    	</component>
+    	<component type="com.pblabs.rendering2D.SpriteRenderer" name="Render">
+    		<scene componentReference="SceneDB"/>
+    		<positionProperty>@Spatial.position</positionProperty>
+    		<fileName>assets/player.png</fileName>
+    	</component>
+    	<component type="KeyboardFireComponent" name="KeyboardFire">
+    		<positionProperty>@Spatial.position</positionProperty>
+    	</component>
+    	<component type="KeyboardMovementComponent" name="KeyboardMovement">
+    		<positionProperty>@Spatial.position</positionProperty>
+    	</component>
+		<component type="TriggerSwitchLevelOnCollideComponent" name="TriggerSwitchLevelOnCollide"/>
+		<component type="RemoveAndCreateOnCollideComponent" name="RemoveOnCollide">
+    		<newComponentName>Explosion</newComponentName>
+    		<positionProperty>@Spatial.position</positionProperty>
+    		<newComponentPositionProperty>@Spatial.position</newComponentPositionProperty>
+    	</component>
+  	</entity>
+  	
+  	<template name="Enemy">
+    	<component type="com.pblabs.box2D.Box2DSpatialComponent" name="Spatial">
+    		<spatialManager componentReference="SceneDB"/>
+      		<canRotate>false</canRotate>
+      		<canSleep>false</canSleep>
+      		<collidesWithTypes childType="String">
+        		<_0>Player</_0>
+      		</collidesWithTypes>
+      		<size type="">
+				<x>49</x>
+				<y>74</y>
+			</size>
+      		<collisionShapes childType="com.pblabs.box2D.CollisionShape">
+        		<_0 type="com.pblabs.box2D.PolygonCollisionShape">
+		          <vertices childType="flash.geom.Point">
+		            <_0 type="">
+		              <x>-1</x>
+		              <y>-1</y>
+		            </_0>
+		            <_1 type="">
+		              <x>1</x>
+		              <y>-1</y>
+		            </_1>
+		            <_2 type="">
+		              <x>1</x>
+		              <y>1</y>
+		            </_2>
+		            <_3 type="">
+		              <x>-1</x>
+		              <y>1</y>
+		            </_3>
+		          </vertices>
+		        </_0>
+      		</collisionShapes>
+      		<collisionType childType="String">
+        		<_0>Enemy</_0>
+        		<_1>Renderable</_1>
+      		</collisionType>      		
+    	</component>
+    	<component type="com.pblabs.rendering2D.SpriteRenderer" name="Render">
+    		<scene componentReference="SceneDB"/>
+    		<positionProperty>@Spatial.position</positionProperty>
+    		<fileName>assets/enemy.png</fileName>
+    	</component>
+    	<component type="RemoveAndCreateOnCollideComponent" name="RemoveOnCollide">
+    		<newComponentName>Explosion</newComponentName>
+    		<positionProperty>@Spatial.position</positionProperty>
+    		<newComponentPositionProperty>@Spatial.position</newComponentPositionProperty>
+    	</component>
+		<component type="RemoveIfOffScreenComponent" name="RemoveIfOffScreen">
+			<positionProperty>@Spatial.position</positionProperty>
+			<sizeProperty>@Spatial.size</sizeProperty>
+		</component>
+  	</template>
+	
+	<template name="BasicEnemy" template="Enemy">
+		<component type="BasicEnemyLogicComponent" name="BasicEnemyLogic">
+			<positionProperty>@Spatial.position</positionProperty>
+			<movementSpeed>30</movementSpeed>
+		</component>
+	</template>
+	
+	<template name="Bullet">
+    	<component type="RemoveAndCreateOnCollideComponent" name="RemoveOnCollide">
+    		<newComponentName>Explosion</newComponentName>
+    		<positionProperty>@Spatial.position</positionProperty>
+    		<newComponentPositionProperty>@Spatial.position</newComponentPositionProperty>
+    	</component>	
+		<component type="com.pblabs.box2D.Box2DSpatialComponent" name="Spatial">
+    		<spatialManager componentReference="SceneDB"/>
+      		<canRotate>false</canRotate>
+      		<canSleep>false</canSleep>
+      		<collidesWithTypes childType="String">
+        		<_0>Enemy</_0>
+      		</collidesWithTypes>
+      		<size type="">
+				<x>20</x>
+				<y>20</y>
+			</size>
+      		<collisionShapes childType="com.pblabs.box2D.CollisionShape">
+        		<_0 type="com.pblabs.box2D.PolygonCollisionShape">
+		          <vertices childType="flash.geom.Point">
+		            <_0 type="">
+		              <x>-1</x>
+		              <y>-1</y>
+		            </_0>
+		            <_1 type="">
+		              <x>1</x>
+		              <y>-1</y>
+		            </_1>
+		            <_2 type="">
+		              <x>1</x>
+		              <y>1</y>
+		            </_2>
+		            <_3 type="">
+		              <x>-1</x>
+		              <y>1</y>
+		            </_3>
+		          </vertices>
+		        </_0>
+      		</collisionShapes>
+      		<collisionType childType="String">
+        		<_0>Player</_0>
+        		<_1>Renderable</_1>
+      		</collisionType>      		
+    	</component>	  	
+	</template>
+	    	
+  	<group name="Level2Data">
+		<objectReference name="Background"/>
+	    <objectReference name="ExplosionSpriteSheet"/>
+		<objectReference name="Player"/>
+		<objectReference name="EnemyManager"/>
+		<objectReference name="LevelSwitchManager"/>
+  	</group>
+  
+</things>
