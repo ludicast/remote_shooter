@@ -5,3 +5,4 @@
 .settings/*
 bin-debug/*
 bin/
+libs/

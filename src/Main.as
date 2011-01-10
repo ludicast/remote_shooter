@@ -18,8 +18,11 @@ package
 	import com.pblabs.rendering2D.ui.SceneView;
 	
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.geom.Point;
+	import flash.net.URLLoader;
+	import flash.net.URLRequest;
 	import flash.ui.Keyboard;
 	
 	[SWF(width="1024", height="1024", backgroundColor="0x7F92FF")]
@@ -33,9 +36,20 @@ package
 		
 		private var ambassador:Ambassador;
 		
-		protected function startConnection():void {
-			ambassador = new Ambassador("4ce6b6d1e2acf429ad00019b",this, {type: "2d", data: {message: "No message", buttons: [["up"], ["left", "stop", "right"], ["fire"]]}}); 
-		}	
+		public function startConnection():void {
+			var loader:URLLoader  = new URLLoader();
+			loader.addEventListener(Event.COMPLETE, dataLoadedEvent);
+			loader.load(new URLRequest("ambassadorData.xml"));
+		}
+		
+		public function dataLoadedEvent(event:Event):void {
+			this.ambassador = Ambassador.build(event.target.data, this, [{type: "2d", data: {message: "No message", buttons: [
+				[InteractionEvent.UP],
+				[InteractionEvent.LEFT, InteractionEvent.STOP, InteractionEvent.RIGHT],
+				[InteractionEvent.DOWN],
+				[InteractionEvent.FIRE]
+			]}}]);									
+		}
 		
 		public function recevedRemoteInteractionEvent(message:String):void {
 			switch (message) {
